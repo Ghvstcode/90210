@@ -7,6 +7,9 @@ const BlogPostSchema = new mongoose.Schema( {
     },
     HeaderImage: {
         type: Buffer
+    },
+    likes: {
+        type: Number
     }
 },{
     timestamps:true
