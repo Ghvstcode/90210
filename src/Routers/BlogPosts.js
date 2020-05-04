@@ -18,17 +18,14 @@ const upload = multer({
 
 //Creating a new post
 //Authenticated
-router.post('/Newpost', isAuthenticated,/*upload.single('avatar'),*/ async (req, res) => {
+router.post('/Newpost', isAuthenticated, async (req, res) => {
 
-    console.log(req)
     const post = new Post({
         ...req.body,
         owner: req.user._id
     })
     console.log(post)
     try {
-        // const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250}).png().toBuffer()
-        // req.user.avatar = buffer
         await post.save()
         res.status(201).send({post})
     } catch (e) {
@@ -38,10 +35,10 @@ router.post('/Newpost', isAuthenticated,/*upload.single('avatar'),*/ async (req,
 
 //Updating a post
 //Authenticated
-router.patch ('/user/blog/:id/update',/*auth,*/ async (req,res) => {
+router.patch ('/user/blog/:id/update',isAuthenticated, async (req,res) => {
     const _id = req.params.id
     const updates = Object.keys(req.body)
-    const allowedUpdates = ['text', 'HeaderImage']
+    const allowedUpdates = ['titl', 'content']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
