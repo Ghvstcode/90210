@@ -19,7 +19,8 @@ router.post('/newuser', async (req, res) => {
 //NotAuthenticated
 router.post('/login', async (req, res) => {
     try {
-        const user = findByCredentials(req.body.email, req.body.password)
+        const user = await User.findByCredentials(req.body.email, req.body.password)
+
         const token = await user.generateAuthToken()
         if(!user) {
             throw  new Error ('Unable to login')

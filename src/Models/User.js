@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-//const BlogPost = require('./BlogPost')
+const BlogPost = require('./BlogPost')
 
 const UserSchema = new mongoose.Schema({
     name: {
@@ -95,6 +95,12 @@ UserSchema.statics.findByCredentials = async (email, password) => {
 
     return user
 }
+
+UserSchema.pre('remove', async function(next) {
+    const user = this
+    await BlogPost.deleteMany({ owner:user._id})
+    next()
+})
 
 const User = mongoose.model('User', UserSchema)
 module.exports = User;

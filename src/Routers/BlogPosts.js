@@ -71,7 +71,7 @@ router.delete('/blog/:id/delete', isAuthenticated, async (req, res)=>{
          }
          res.send(post)
      } catch (e) {
-         res.status(500).send()
+         res.status(500).send("Unable to delete document")
      }
  })
  
