@@ -33,6 +33,29 @@ router.post('/Newpost', upload.single('avatar'), async (req, res) => {
 
 //Updating a post
 //Authenticated
+router.patch ('/user/blog/:id/update',/*auth,*/ async (req,res) => {
+    const _id = req.params.id
+    const updates = Object.keys(req.body)
+    const allowedUpdates = ['text', 'HeaderImage']
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+
+    if (!isValidOperation) {
+        return res.status(404).send( { error: 'invalid update!'})
+    }
+
+    try {        
+        // updates.forEach( (update)=> req.user[update] = req.body[update])
+        // await req.user.save()
+        const post = await Post.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true,})
+        if (!post) {
+            return res.status(404).send("Blog post not found")  
+        }
+        await req.post.save()
+        res.send(req.post)
+    } catch (e) {
+        res.status(400).send(e)
+    }
+})
 
 
 
