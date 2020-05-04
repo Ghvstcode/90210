@@ -35,10 +35,10 @@ router.post('/Newpost', isAuthenticated, async (req, res) => {
 
 //Updating a post
 //Authenticated
-router.patch ('/user/blog/:id/update',isAuthenticated, async (req,res) => {
+router.patch ('/user/blog/update/:id',isAuthenticated, async (req,res) => {
     const _id = req.params.id
     const updates = Object.keys(req.body)
-    const allowedUpdates = ['titl', 'content']
+    const allowedUpdates = ['title', 'content']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
@@ -48,12 +48,14 @@ router.patch ('/user/blog/:id/update',isAuthenticated, async (req,res) => {
     try {        
         // updates.forEach( (update)=> req.user[update] = req.body[update])
         // await req.user.save()
-        const post = await Post.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true,})
+        const post = await Post.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true, useFindAndModify: false})
         if (!post) {
             return res.status(404).send("Blog post not found")  
         }
-        await req.post.save()
-        res.send(req.post)
+
+        await post.save()
+
+        res.send(post)
     } catch (e) {
         res.status(400).send(e)
     }
