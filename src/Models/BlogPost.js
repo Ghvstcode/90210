@@ -1,15 +1,14 @@
 const mongoose = require("mongoose");
+const User = require('./User')
 
 const BlogPostSchema = new mongoose.Schema( {
-    text: {
-        type: String,
+    title: String,
+    content: String,
+    createdAt: { type: Date, default: Date.now },
+    owner: {
+        type: mongoose.Schema.Types.ObjectId,
         required: true,
-    },
-    HeaderImage: {
-        type: Buffer
-    },
-    likes: {
-        type: Number
+        ref: 'User'
     }
 },{
     timestamps:true

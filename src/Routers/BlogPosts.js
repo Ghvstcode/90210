@@ -2,6 +2,7 @@ const express = require('express')
 const router = new express.Router()
 const Post = require('../Models/BlogPost')
 const multer = require('multer')
+const isAuthenticated = require('../Middleware/auth')
 
 const upload = multer({
     limit: {
@@ -17,13 +18,17 @@ const upload = multer({
 
 //Creating a new post
 //Authenticated
-router.post('/Newpost', upload.single('avatar'), async (req, res) => {
+router.post('/Newpost', isAuthenticated,/*upload.single('avatar'),*/ async (req, res) => {
 
-    console.log(req.body)
-    const post = new Post (req.body)
+    console.log(req)
+    const post = new Post({
+        ...req.body,
+        owner: req.user._id
+    })
+    console.log(post)
     try {
-        const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250}).png().toBuffer()
-        req.user.avatar = buffer
+        // const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250}).png().toBuffer()
+        // req.user.avatar = buffer
         await post.save()
         res.status(201).send({post})
     } catch (e) {
