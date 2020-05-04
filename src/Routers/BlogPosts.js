@@ -61,6 +61,21 @@ router.patch ('/user/blog/update/:id',isAuthenticated, async (req,res) => {
     }
 })
 
+//Deleting a blog post
+//Is authenticated
+router.delete('/blog/:id/delete', isAuthenticated, async (req, res)=>{
+    try {
+         const post = await Post.findByIdAndDelete({_id:req.params.id,owner: req.user._ids})
+         if(!post) {
+            res.status(404).send("Blog post not found")
+         }
+         res.send(post)
+     } catch (e) {
+         res.status(500).send()
+     }
+ })
+ 
+
 
 
 module.exports = router
