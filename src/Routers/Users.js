@@ -2,6 +2,7 @@ const express = require('express')
 const router = new express.Router()
 const User = require('../Models/User')
 const isAuthenticated = require('../Middleware/auth')
+const Post = require('../Models/BlogPost')
 
 //Creating a new user
 //NotAuthenticated
@@ -36,8 +37,17 @@ router.post('/users/login', async (req, res) => {
 
 //Viewing your profile and all your posts
 router.get('/users/profile', isAuthenticated, async (req,res) => {
-    const post = await Post.findbyId({_id,owner: req.user._id})
-    res.send(req.user, post)
+    try {
+        const user = req.user//await User.findByCredentials(req.body.email, req.body.password)
+        const post = await Post.find({owner: req.user._id})
+        res.send({
+            user, 
+            post
+        })
+    } catch (e) {
+        res.status(404).send(e)
+    }
+
 })
 
 module.exports = router

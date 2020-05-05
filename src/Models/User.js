@@ -54,7 +54,7 @@ UserSchema.virtual('BlogPost', {
 UserSchema.methods.toJSON = function () {
     const user = this
     const userObject = user.toObject()
-    console.log(userObject)
+    //console.log(userObject)
 
     delete userObject.password
     delete userObject.tokens
