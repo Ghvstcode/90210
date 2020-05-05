@@ -1,10 +1,11 @@
 const express = require('express')
 const router = new express.Router()
 const User = require('../Models/User')
+const isAuthenticated = require('../Middleware/auth')
 
 //Creating a new user
 //NotAuthenticated
-router.post('/newuser', async (req, res) => {
+router.post('/users/newuser', async (req, res) => {
     const user = new User (req.body)
     const token = await user.generateAuthToken()
     try {
@@ -17,7 +18,7 @@ router.post('/newuser', async (req, res) => {
 
 //Logging In a User
 //NotAuthenticated
-router.post('/login', async (req, res) => {
+router.post('/users/login', async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
 
@@ -31,6 +32,12 @@ router.post('/login', async (req, res) => {
     }
 })
 
-//Login with twitter
+//Login with github
+
+//Viewing your profile and all your posts
+router.get('/users/profile', isAuthenticated, async (req,res) => {
+    const post = await Post.findbyId({_id,owner: req.user._id})
+    res.send(req.user, post)
+})
 
 module.exports = router

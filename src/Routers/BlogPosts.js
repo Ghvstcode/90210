@@ -18,7 +18,7 @@ const upload = multer({
 
 //Creating a new post
 //Authenticated
-router.post('/Newpost', isAuthenticated, async (req, res) => {
+router.post('/blog/Newpost', isAuthenticated, async (req, res) => {
 
     const post = new Post({
         ...req.body,
@@ -35,7 +35,7 @@ router.post('/Newpost', isAuthenticated, async (req, res) => {
 
 //Updating a post
 //Authenticated
-router.patch ('/user/blog/update/:id',isAuthenticated, async (req,res) => {
+router.patch ('/blog/update/:id',isAuthenticated, async (req,res) => {
     const _id = req.params.id
     const updates = Object.keys(req.body)
     const allowedUpdates = ['title', 'content']
@@ -60,6 +60,20 @@ router.patch ('/user/blog/update/:id',isAuthenticated, async (req,res) => {
         res.status(400).send(e)
     }
 })
+//Searching for a users 
+//Not authenticated
+// router.get('/blog/:id', isAuthenticated, async (req,res) => {
+//     const _id = req.params.id
+//     try {
+//         const post = await Post.findOne({_id,owner: req.user._id})
+//         if (!post) {
+//             return res.status(404).send("You do not have any blogposts")
+//         }
+//         res.send(post)
+//     } catch (e) {
+//         res.status(500).send(e)
+//     }
+// })
 
 //Deleting a blog post
 //Is authenticated
