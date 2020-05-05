@@ -38,13 +38,13 @@ Database Models
 - A user should be able to search for another user and see the users comments, & posts if any.
 
 Routes
--Create User
--Login User with email & password
+-Create User => Done
+-Login User with email & password 
 Login user with twitter
--Create Blogpost
--Read blogpost
+-Create Blogpost => Done
+-Read blogpost 
 -Comment on a blog post
--Edit blogpost
+-Edit blogpost => Done
 -Star a blogpost
 -Search for a blog post
 - search for a user and should get his blogposts & Comments
