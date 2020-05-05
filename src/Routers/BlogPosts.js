@@ -62,18 +62,18 @@ router.patch ('/blog/update/:id',isAuthenticated, async (req,res) => {
 })
 //Searching for a users 
 //Not authenticated
-// router.get('/blog/:id', isAuthenticated, async (req,res) => {
-//     const _id = req.params.id
-//     try {
-//         const post = await Post.findOne({_id,owner: req.user._id})
-//         if (!post) {
-//             return res.status(404).send("You do not have any blogposts")
-//         }
-//         res.send(post)
-//     } catch (e) {
-//         res.status(500).send(e)
-//     }
-// })
+router.get('/blog/:id', isAuthenticated, async (req,res) => {
+    const _id = req.params.id
+    try {
+        const post = await Post.findOne({_id,owner: req.user._id})
+        if (!post) {
+            return res.status(404).send("You do not have any blogposts")
+        }
+        res.send(post)
+    } catch (e) {
+        res.status(500).send(e)
+    }
+})
 
 //Deleting a blog post
 //Is authenticated
