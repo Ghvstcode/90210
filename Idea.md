@@ -51,3 +51,5 @@ Login user with twitter
 
 Immediate To-Do
 - handle the images being stored in the database, both the blogpost header and the user avatar
+
+setting up
