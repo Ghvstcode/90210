@@ -74,31 +74,57 @@ router.patch ('/blog/update/:id',isAuthenticated, async (req,res) => {
 //         res.status(500).send(e)
 //     }
 // })
-router.get('/blogposts', isAuthenticated, async (req,res) => {
-    const match =  {}
-    const sort = {}
-    if(req.query.sortBy) {
-        const parts = req.query.sortBy.split(':')
-        sort[parts[0]] = parts[1] === 'desc' ? -1 : 1 
-    }
-    if(req.query.title) {
-        match.title = req.query.title
-    }
+router.get('/blogposts', async (req,res) => {
     try {
-        await req.user.populate({
-            path: 'blogposts',
-            match,
-            options: {
-                limit: parseInt(req.query.limit),
-                skip: parseInt(req.query.skip),
-                sort
-            }
-        }).execPopulate()
-        res.send(req.user.blogposts)
+        const match = req.params.match;
+        console.log(match)
+        const { title, postcontent } = req.query;
+        if (title) {
+            const title = await Post.find({
+                "title":  req.query.title ,
+                //user: user.id,
+            }).sort({
+                date: -1,
+            });
+            return res.send(title)
+        }
+        if (postcontent) {
+            const post = await Post.find({
+                "content":  req.query.postcontent ,
+                //user: user.id,
+            }).sort({
+                date: -1,
+            });
+            res.send(post)
+        }
     } catch(e) {
-        console.log(e)
-        res.status(500).send(e)
+        res.status(400).send(e)
     }
+
+    // const match =  {}
+    // const sort = {}
+    // if(req.query.sortBy) {
+    //     const parts = req.query.sortBy.split(':')
+    //     sort[parts[0]] = parts[1] === 'desc' ? -1 : 1 
+    // }
+    // if(req.query.title) {
+    //     match.title = req.query.title
+    // }
+    // try {
+    //     await req.user.populate({
+    //         path: 'blogposts',
+    //         match,
+    //         options: {
+    //             limit: parseInt(req.query.limit),
+    //             skip: parseInt(req.query.skip),
+    //             sort
+    //         }
+    //     }).execPopulate()
+    //     res.send(req.user.blogposts)
+    // } catch(e) {
+    //     console.log(e)
+    //     res.status(500).send(e)
+    // }
 })
 
 //Deleting a blog post
