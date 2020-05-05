@@ -46,8 +46,8 @@ Login user with twitter
 -Comment on a blog post
 -Edit blogpost => Done
 -Star a blogpost
--Search for a blog post
-- search for a user and should get his blogposts & Comments
+-Search for a blog post => Done
+- search for a user and should get his blogposts => Done
 
 Immediate To-Do
 - handle the images being stored in the database, both the blogpost header and the user avatar

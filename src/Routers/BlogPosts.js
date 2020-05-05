@@ -46,8 +46,6 @@ router.patch ('/blog/update/:id',isAuthenticated, async (req,res) => {
     }
 
     try {        
-        // updates.forEach( (update)=> req.user[update] = req.body[update])
-        // await req.user.save()
         const post = await Post.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true, useFindAndModify: false})
         if (!post) {
             return res.status(404).send("Blog post not found")  
@@ -60,86 +58,33 @@ router.patch ('/blog/update/:id',isAuthenticated, async (req,res) => {
         res.status(400).send(e)
     }
 })
-//Searching for a users 
-//Not authenticated
-// router.get('/blog/:id', isAuthenticated, async (req,res) => {
-//     const _id = req.params.id
-//     try {
-//         const post = await Post.findOne({_id,owner: req.user._id})
-//         if (!post) {
-//             return res.status(404).send("You do not have any blogposts")
-//         }
-//         res.send(post)
-//     } catch (e) {
-//         res.status(500).send(e)
-//     }
-// })
+
+//Searching for a post by its title
 router.get('/blogposts', async (req,res) => {
     try {
-        const match = req.params.match;
-        console.log(match)
-        const { title, postcontent } = req.query;
-        if (title) {
-            const title = await Post.find({
-                "title":  req.query.title ,
-                //user: user.id,
-            }).sort({
-                date: -1,
-            });
-            return res.send(title)
-        }
-        if (postcontent) {
-            const post = await Post.find({
-                "content":  req.query.postcontent ,
-                //user: user.id,
-            }).sort({
-                date: -1,
-            });
-            res.send(post)
-        }
+        const titleContent = req.query.title.toString()
+        const post = await Post.findOne({ title:  titleContent})
+        res.send(post)
     } catch(e) {
         res.status(400).send(e)
     }
 
-    // const match =  {}
-    // const sort = {}
-    // if(req.query.sortBy) {
-    //     const parts = req.query.sortBy.split(':')
-    //     sort[parts[0]] = parts[1] === 'desc' ? -1 : 1 
-    // }
-    // if(req.query.title) {
-    //     match.title = req.query.title
-    // }
-    // try {
-    //     await req.user.populate({
-    //         path: 'blogposts',
-    //         match,
-    //         options: {
-    //             limit: parseInt(req.query.limit),
-    //             skip: parseInt(req.query.skip),
-    //             sort
-    //         }
-    //     }).execPopulate()
-    //     res.send(req.user.blogposts)
-    // } catch(e) {
-    //     console.log(e)
-    //     res.status(500).send(e)
-    // }
 })
+
 
 //Deleting a blog post
 //Is authenticated
 router.delete('/blog/:id/delete', isAuthenticated, async (req, res)=>{
     try {
-         const post = await Post.findByIdAndDelete({_id:req.params.id,owner: req.user._ids})
-         if(!post) {
-            res.status(404).send("Blog post not found")
-         }
-         res.send(post)
-     } catch (e) {
-         res.status(500).send("Unable to delete document")
-     }
- })
+        const post = await Post.findByIdAndDelete({_id:req.params.id,owner: req.user._ids})
+        if(!post) {
+        res.status(404).send("Blog post not found")
+        }
+        res.send(post)
+    } catch (e) {
+        res.status(500).send("Unable to delete document")
+    }
+})
  
 
 
