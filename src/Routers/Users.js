@@ -70,7 +70,6 @@ router.get('/oauth-callback', (req, res) => {
                 if(githubEmail === null) {
                     const socialUser = new githubUser({name: githubUsername, token: githubUserToken})
                     socialUser.save().then((user)=> {
-                        // console.log(user)
                         res.status(200).send(user)
                         console.log(user)
                     }).catch((err)=> {
