@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken')
 const User = require('../Models/User')
+const githubUser = require('../Models/GithubUser')
 
 
 const auth =  async (req,res,next) => {
@@ -7,9 +8,11 @@ const auth =  async (req,res,next) => {
         const token = req.header('Authorization').replace('Bearer ', '')
         const decoded = jwt.verify(token, 'blueferrari')//REMEMBER TO HIDE SECRET
         const user =  await User.findOne({ _id:decoded._id, 'tokens.token': token})
-        if(!user) {
+        const socialUser = await githubUser.findOne({token: token})
+        if(!user || socialUser) {
             throw new Error
-        }
+        } 
+
         req.token = token
         req.user = user
         next()

@@ -6,11 +6,12 @@ const BlogPost = require('./BlogPost')
 const UserSchema = new mongoose.Schema({
     name: {
         type: String,
-        unique: true,
         trim: true,
+        unique: true,
     },
     email: {
         type: String,
+        unique: true,
     },
     avatar: {
         type: Buffer

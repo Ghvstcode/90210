@@ -44,13 +44,12 @@ router.get('/user/login/authorize', (req, res) => {
 
 
 router.get('/oauth-callback', (req, res) => {
-    let githubUserToken = ""
     const body = {
       client_id: client_id,
       client_secret: client_secret,
       code: req.query.code
     };
-    const opts = { headers: { accept: 'application/json', /*Authorization: 'token ' + token*/} };
+    const opts = { headers: { accept: 'application/json'} };
     let one = `https://github.com/login/oauth/access_token`
     let two = 'https://api.github.com/user'
 
@@ -71,9 +70,7 @@ router.get('/oauth-callback', (req, res) => {
                     const socialUser = new githubUser({name: githubUsername, token: githubUserToken})
                     socialUser.save().then((user)=> {
                         res.status(200).send(user)
-                        console.log(user)
                     }).catch((err)=> {
-                        console.log("err")
                         res.status(500).json({ message: err.message })
                     })
                 } 
@@ -82,112 +79,19 @@ router.get('/oauth-callback', (req, res) => {
                     const socialUser = new githubUser({name: githubUsername, token: githubUserToken, email: githubEmail})
                     socialUser.save().then((user)=> {
                         res.status(200).send(user)
-                        console.log(user)
                     }).catch((err)=> {
-                        res.status(500).json({ message: err.message })
+                        res.status(500).json({ message1: err.message })
                     })
                 }
-    
-                console.log(githubUsername)
-                console.log(githubEmail)
-                console.log(githubUserToken)
             }).catch((e) => {
                 res.status(500).json({ message: e.message })
-                console.log(({ message: e.message }))
             })
         }).catch((e) => {
             res.status(500).json({ message: e.message })
         })
     }catch (e) {
         res.status(500).json({ message: e.message })
-    }
-    
-
-    // axios.post(one,body,opts).then(res => res.data['access_token'])
-    //   .then(_token => {
-    //     githubUserToken = _token;
-    //     console.log('My token:', githubUserToken);
-    //     const options = { headers: { accept: 'application/json', Authorization: 'token ' + githubUserToken} };
-    //     const requestTwo = axios.get(two, options);
-    //     requestTwo.then((response)=> {
-    //         const githubUsername = response.data.name
-    //         const githubEmail = response.data.email
-
-    //         if(githubEmail === null) {
-    //             const socialUser = new githubUser({name: githubUsername, token: githubUserToken})
-    //             socialUser.save().then((user)=> {
-    //                 // console.log(user)
-    //                 res.status(200).send(user)
-    //                 console.log(user)
-    //             }).catch((err)=> {
-    //                 console.log(err)
-    //                 res.status(500).json({ message: err.message })
-    //             })
-    //         } 
-
-    //         if(githubEmail) {
-    //             const socialUser = new githubUser({name: githubUsername, token: githubUserToken, email: githubEmail})
-    //             socialUser.save().then((user)=> {
-    //                 res.status(200).send(user)
-    //                 console.log(user)
-    //             }).catch((err)=> {
-    //                 res.status(500).json({ message: err.message })
-    //             })
-    //         }
-
-    //         console.log(githubUsername)
-    //         console.log(githubEmail)
-    //         console.log(githubUserToken)
-    //     })
-
-    //   }).catch(err => res.status(500).json({ message: err.message }));
-
-    //   axios.post(one,body,opts).then(res => res.data['access_token']).
-    //   then(_token => {
-    //     githubUserToken = _token;
-    //     console.log('My token:', githubUserToken);
-    //     const options = { headers: { accept: 'application/json', Authorization: 'token ' + githubUserToken} };
-    //     const requestTwo = axios.get(two, options);
-    //     requestTwo.then((response)=> {
-    //         const githubUsername = response.data.name
-    //         const githubEmail = response.data.email
-
-    //         if(githubEmail === null) {
-    //             const socialUser = new githubUser({name: githubUsername, token: githubUserToken})
-    //             socialUser.save().then((user)=> {
-    //                 // console.log(user)
-    //                 res.status(200).send(user)
-    //                 console.log(user)
-    //             }).catch((err)=> {
-    //                 console.log(err)
-    //                 res.status(500).json({ message: err.message })
-    //             })
-    //         } 
-
-    //         if(githubEmail) {
-    //             const socialUser = new githubUser({name: githubUsername, token: githubUserToken, email: githubEmail})
-    //             socialUser.save().then((user)=> {
-    //                 res.status(200).send(user)
-    //                 console.log(user)
-    //             }).catch((err)=> {
-    //                 res.status(500).json({ message: err.message })
-    //             })
-    //         }
-
-    //         console.log(githubUsername)
-    //         console.log(githubEmail)
-    //         console.log(githubUserToken)
-    //     })
-
-    //   }).catch(err => res.status(500).json({ message: err.message }));
-
-    //   catch(err => res.status(500).json({ message: err.message }));
-
-
-
-
-
-    
+    }    
     
 })
 
