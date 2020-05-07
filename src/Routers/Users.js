@@ -3,6 +3,7 @@ const router = new express.Router()
 const User = require('../Models/User')
 const isAuthenticated = require('../Middleware/auth')
 const Post = require('../Models/BlogPost')
+const githubUser = require('../Models/GithubUser')
 const axios = require('axios');
 let token = null;
 const client_id = "893912dc63ad4e40b06c"
@@ -42,125 +43,154 @@ router.get('/user/login/authorize', (req, res) => {
 });
 
 
-router.get('/oauth-callback', async (req, res) => {
+router.get('/oauth-callback', (req, res) => {
     let githubUserToken = ""
     const body = {
       client_id: client_id,
       client_secret: client_secret,
       code: req.query.code
     };
-    const opts = { headers: { accept: 'application/json', Authorization: 'token ' + token} };
+    const opts = { headers: { accept: 'application/json', /*Authorization: 'token ' + token*/} };
     let one = `https://github.com/login/oauth/access_token`
     let two = 'https://api.github.com/user'
 
-
-  
-    axios.post(one,body,opts).then(res => res.data['access_token']).
-      then(_token => {
-        githubUserToken = _token;
-        console.log('My token:', githubUserToken);
-        const options = { headers: { accept: 'application/json', Authorization: 'token ' + githubUserToken} };
-        const requestTwo = axios.get(two, options);
-        requestTwo.then((response)=> {
-            const githubUsername = response.data.name
-            const githubEmail = response.data.email
-            console.log(githubUsername)
-            console.log(githubEmail)
-            console.log(githubUserToken)
-        })
-       /*const githubUser =  new User ({tokens : [{token: token}]})
-       console.log(githubUser)
-        githubUser.save().then((user)=> {
-            res.status(200).send(user)
-            console.log('saved')
-        }).catch((err)=> {
-            res.status(500).json({ message: err.message })
-         }) */
-        res.json({ ok: 1 });	
-
-      }).
-      catch(err => res.status(500).json({ message: err.message }));
-
-
-
-
-
+    try {
+        axios.post(one,body,opts).then((githubres) => {
+            const githubUserToken = githubres.data['access_token']
+            const options = { headers: { accept: 'application/json', Authorization: 'token ' + githubUserToken} };
+            const requestTwo = axios.get(two, options);
     
-    // axios.post(`https://github.com/login/oauth/access_token`, body, opts).
-    //   then(res => res.data/*['access_token']*/).
+            requestTwo.then((response)=> {
+                if (response.status != 200) {
+                    throw new Error()
+                }
+                const githubUsername = response.data.name
+                const githubEmail = response.data.email
+    
+                if(githubEmail === null) {
+                    const socialUser = new githubUser({name: githubUsername, token: githubUserToken})
+                    socialUser.save().then((user)=> {
+                        // console.log(user)
+                        res.status(200).send(user)
+                        console.log(user)
+                    }).catch((err)=> {
+                        console.log("err")
+                        res.status(500).json({ message: err.message })
+                    })
+                } 
+    
+                if(githubEmail) {
+                    const socialUser = new githubUser({name: githubUsername, token: githubUserToken, email: githubEmail})
+                    socialUser.save().then((user)=> {
+                        res.status(200).send(user)
+                        console.log(user)
+                    }).catch((err)=> {
+                        res.status(500).json({ message: err.message })
+                    })
+                }
+    
+                console.log(githubUsername)
+                console.log(githubEmail)
+                console.log(githubUserToken)
+            }).catch((e) => {
+                res.status(500).json({ message: e.message })
+                console.log(({ message: e.message }))
+            })
+        }).catch((e) => {
+            res.status(500).json({ message: e.message })
+        })
+    }catch (e) {
+        res.status(500).json({ message: e.message })
+    }
+    
+
+    // axios.post(one,body,opts).then(res => res.data['access_token'])
+    //   .then(_token => {
+    //     githubUserToken = _token;
+    //     console.log('My token:', githubUserToken);
+    //     const options = { headers: { accept: 'application/json', Authorization: 'token ' + githubUserToken} };
+    //     const requestTwo = axios.get(two, options);
+    //     requestTwo.then((response)=> {
+    //         const githubUsername = response.data.name
+    //         const githubEmail = response.data.email
+
+    //         if(githubEmail === null) {
+    //             const socialUser = new githubUser({name: githubUsername, token: githubUserToken})
+    //             socialUser.save().then((user)=> {
+    //                 // console.log(user)
+    //                 res.status(200).send(user)
+    //                 console.log(user)
+    //             }).catch((err)=> {
+    //                 console.log(err)
+    //                 res.status(500).json({ message: err.message })
+    //             })
+    //         } 
+
+    //         if(githubEmail) {
+    //             const socialUser = new githubUser({name: githubUsername, token: githubUserToken, email: githubEmail})
+    //             socialUser.save().then((user)=> {
+    //                 res.status(200).send(user)
+    //                 console.log(user)
+    //             }).catch((err)=> {
+    //                 res.status(500).json({ message: err.message })
+    //             })
+    //         }
+
+    //         console.log(githubUsername)
+    //         console.log(githubEmail)
+    //         console.log(githubUserToken)
+    //     })
+
+    //   }).catch(err => res.status(500).json({ message: err.message }));
+
+    //   axios.post(one,body,opts).then(res => res.data['access_token']).
     //   then(_token => {
-    //     token = _token;
-    //     console.log('My token:', token);
-    //    /*const githubUser =  new User ({tokens : [{token: token}]})
-    //    console.log(githubUser)
-    //     githubUser.save().then((user)=> {
-    //         res.status(200).send(user)
-    //         console.log('saved')
-    //     }).catch((err)=> {
-    //         res.status(500).json({ message: err.message })
-    //      }) */
-    //     res.json({ ok: 1 });	
-    //     fetch('https://api.github.com/user', {
-	// 		headers: {
-	// 			// Include the token in the Authorization header
-	// 			Authorization: 'token ' + token
-	// 		}
-	// 	})
-	// 	// Parse the response as JSON
-	// 	.then(res => res.json())
-	// 	.then(res => {
-	// 		// Once we get the response (which has many fields)
-	// 		// Documented here: https://developer.github.com/v3/users/#get-the-authenticated-user
-	// 		// Write "Welcome <user name>" to the documents body
-	// 		console.log(res)
-	// 	})
-    //   }).
+    //     githubUserToken = _token;
+    //     console.log('My token:', githubUserToken);
+    //     const options = { headers: { accept: 'application/json', Authorization: 'token ' + githubUserToken} };
+    //     const requestTwo = axios.get(two, options);
+    //     requestTwo.then((response)=> {
+    //         const githubUsername = response.data.name
+    //         const githubEmail = response.data.email
+
+    //         if(githubEmail === null) {
+    //             const socialUser = new githubUser({name: githubUsername, token: githubUserToken})
+    //             socialUser.save().then((user)=> {
+    //                 // console.log(user)
+    //                 res.status(200).send(user)
+    //                 console.log(user)
+    //             }).catch((err)=> {
+    //                 console.log(err)
+    //                 res.status(500).json({ message: err.message })
+    //             })
+    //         } 
+
+    //         if(githubEmail) {
+    //             const socialUser = new githubUser({name: githubUsername, token: githubUserToken, email: githubEmail})
+    //             socialUser.save().then((user)=> {
+    //                 res.status(200).send(user)
+    //                 console.log(user)
+    //             }).catch((err)=> {
+    //                 res.status(500).json({ message: err.message })
+    //             })
+    //         }
+
+    //         console.log(githubUsername)
+    //         console.log(githubEmail)
+    //         console.log(githubUserToken)
+    //     })
+
+    //   }).catch(err => res.status(500).json({ message: err.message }));
+
     //   catch(err => res.status(500).json({ message: err.message }));
 
-    
-});
 
-//   router.get('/oauth-callback', (req, res) => {
-//     const body = {
-//       client_id: client_id,
-//       client_secret: client_secret,
-//       code: req.query.code
-//     };
-//     let one = 
-//     const opts = { headers: { accept: 'application/json' } };
-//     axios.post(`https://github.com/login/oauth/access_token`, body, opts).
-//       then(res => res.data/*['access_token']*/).
-//       then(_token => {
-//         token = _token;
-//         console.log('My token:', token);
-//        /*const githubUser =  new User ({tokens : [{token: token}]})
-//        console.log(githubUser)
-//         githubUser.save().then((user)=> {
-//             res.status(200).send(user)
-//             console.log('saved')
-//         }).catch((err)=> {
-//             res.status(500).json({ message: err.message })
-//          }) */
-//         res.json({ ok: 1 });	
-//         fetch('https://api.github.com/user', {
-// 			headers: {
-// 				// Include the token in the Authorization header
-// 				Authorization: 'token ' + token
-// 			}
-// 		})
-// 		// Parse the response as JSON
-// 		.then(res => res.json())
-// 		.then(res => {
-// 			// Once we get the response (which has many fields)
-// 			// Documented here: https://developer.github.com/v3/users/#get-the-authenticated-user
-// 			// Write "Welcome <user name>" to the documents body
-// 			console.log(res)
-// 		})
-//       }).
-//       catch(err => res.status(500).json({ message: err.message }));
+
+
 
     
-//   });
+    
+})
 
 //Viewing your profile and all your posts
 router.get('/users/profile', isAuthenticated, async (req,res) => {
