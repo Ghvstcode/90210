@@ -3,6 +3,7 @@ const validator = require('validator')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const BlogPost = require('./BlogPost')
+const crypto = require('crypto');
 
 const UserSchema = new mongoose.Schema({
     name: {
@@ -35,6 +36,14 @@ const UserSchema = new mongoose.Schema({
     },
     avatar: {
         type: Buffer
+    },
+    resetPasswordToken: {
+        type: String,
+        required: false
+    },
+    resetPasswordExpires: {
+        type: Date,
+        required: false
     },
     tokens:[{
         token: {
@@ -71,6 +80,11 @@ UserSchema.methods.generateAuthToken = async function () {
 
     return token
 }
+
+UserSchema.methods.generatePasswordReset = function() {
+    this.resetPasswordToken = crypto.randomBytes(20).toString('hex');
+    this.resetPasswordExpires = Date.now() + 3600000; //expires in an hour
+};
 
 UserSchema.pre('save', async function(next) {
     const user  = this
