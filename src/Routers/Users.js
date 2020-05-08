@@ -126,9 +126,9 @@ router.post('/user/forgotpassword', async (req,res) => {
     }
     user.generatePasswordReset();
     try {
-        user.save()
         let resetToken = user.resetPasswordToken
-        console.log(link)
+        console.log(resetToken)
+        user.save()
         sendResetEmail(email, resetToken)
         res.status(200).send("Reset email sent")
     } catch (e) {
@@ -137,22 +137,26 @@ router.post('/user/forgotpassword', async (req,res) => {
     }
 })
 
-exports.resetPassword = async (req, res, next) => {
-	const { password, token } = req.body;
+router.post('/user/resetPassword', async (req,res)=> {
+    const {newPassword, resetToken} =req.body
 	try {
 		const user = await User.findOne(
-			{ resetTokenExpirationDate: { $gt: Date.now() } },
-			{ resetToken: token },
+			//{ resetTokenExpirationDate: { $gt: Date.now() } },
+			{ resetToken: resetToken },
 		);
 		if (!user) {
 			return res.status(400).send("Unable to reset password")
-		}
+        }
+        user.password = newPassword;
+		user.resetToken = undefined;
+		user.resetTokenExpirationDate = undefined;
 		await user.save();
         return res.status(200).send("password reset succesful")
 	} catch (err) {
-		next(err);
+		res.status(500).send(err.message);
 	}
-};
+})
+
 
 module.exports = router
 
