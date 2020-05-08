@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "./node_modules/.bin/env-cmd -f ./src/config/dev.env nodemon src/index.js"
   },
   "author": "GhvstCode",
   "license": "ISC",
@@ -24,6 +24,7 @@
     "validator": "^13.0.0"
   },
   "devDependencies": {
+    "env-cmd": "^10.1.0",
     "nodemon": "^2.0.3"
   }
 }

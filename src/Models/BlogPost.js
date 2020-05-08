@@ -8,11 +8,22 @@ const BlogPostSchema = new mongoose.Schema( {
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref: 'User'||'githubUser'
+        ref: 'User'
     }
 },{
     timestamps:true
 })
-
+//console.log(mongoose.Schema.Types)
+//if(BlogPostSchema.obj.owner.ref === 'User') 
 const BlogPost = mongoose.model('BlogPost', BlogPostSchema)
 module.exports = BlogPost;
+
+
+// if(testBoolean){
+//    object.attributeTwo = "attributeTwo"
+// }else{
+//    object.attributeTwo = "attributeTwoToo"
+// }
+// 2
+
+// object.attributeTwo = testBoolean ? "attributeTwo" : "attributeTwoToo"

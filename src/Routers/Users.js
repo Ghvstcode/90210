@@ -1,3 +1,4 @@
+
 const express = require('express')
 const router = new express.Router()
 const User = require('../Models/User')
@@ -7,8 +8,9 @@ const githubUser = require('../Models/GithubUser')
 const axios = require('axios');
 let token = null;
 const sendResetEmail = require('../utils/resetEmail') 
-const client_id = "893912dc63ad4e40b06c"
-const client_secret = "66f5a100c8968fe473d203de95bcf96adb908f5c"//Change this oh abeg
+const client_id = process.env.client_id
+const client_secret = process.env.client_secret
+
 //Creating a new user
 //NotAuthenticated
 router.post('/users/newuser', async (req, res) => {
@@ -125,9 +127,9 @@ router.post('/user/forgotpassword', async (req,res) => {
     user.generatePasswordReset();
     try {
         user.save()
-        let link = "http://" + req.headers.host + "/api/auth/reset/" + user.resetPasswordToken
+        let resetToken = user.resetPasswordToken
         console.log(link)
-        sendResetEmail(email, link)
+        sendResetEmail(email, resetToken)
         res.status(200).send("Reset email sent")
     } catch (e) {
         //console.log(e)
@@ -135,8 +137,22 @@ router.post('/user/forgotpassword', async (req,res) => {
     }
 })
 
-
+exports.resetPassword = async (req, res, next) => {
+	const { password, token } = req.body;
+	try {
+		const user = await User.findOne(
+			{ resetTokenExpirationDate: { $gt: Date.now() } },
+			{ resetToken: token },
+		);
+		if (!user) {
+			return res.status(400).send("Unable to reset password")
+		}
+		await user.save();
+        return res.status(200).send("password reset succesful")
+	} catch (err) {
+		next(err);
+	}
+};
 
 module.exports = router
 
-//505dcf72b662b0f129693b0ba470d35850c9eb13

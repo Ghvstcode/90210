@@ -13,6 +13,10 @@ const UserSchema = new mongoose.Schema({
         type: String,
         unique: true,
     },
+    category: {
+        type: String,
+        default: "githubUser",
+    },
     avatar: {
         type: Buffer
     },
@@ -45,8 +49,8 @@ UserSchema.pre('remove', async function(next) {
     next()
 })
 
-const githubUser = mongoose.model('githubUser', UserSchema)
-module.exports = githubUser;
+const User = mongoose.model('githubUser', UserSchema)
+module.exports = User;
 
 
 

@@ -1,3 +1,4 @@
+
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
@@ -8,14 +9,14 @@ const transporter = nodemailer.createTransport({
 	},
 });
 
-const sendResetEmail = (to, link) =>
+const sendResetEmail = (to, resetToken) =>
 	transporter.sendMail(
 		{
 			from: process.env.GMAIL,
 			to,
 			subject: "Password Reset Token!",
 			html: `<h2>This is your password reset token</h2>
-                <p><b>${link}</b> <br /> Please note that the token expires in one hour.</p>
+                <p><b>${resetToken}</b> <br /> Please note that the token expires in one hour.</p>
           `,
 		},
 		function (err, info) {
