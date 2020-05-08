@@ -81,9 +81,10 @@ UserSchema.methods.generateAuthToken = async function () {
     return token
 }
 
-UserSchema.methods.generatePasswordReset = function() {
-    this.resetPasswordToken = crypto.randomBytes(20).toString('hex');
-    this.resetPasswordExpires = Date.now() + 3600000; //expires in an hour
+UserSchema.methods.generatePasswordReset = async function() {
+    const user = this
+    user.resetPasswordToken = crypto.randomBytes(20).toString('hex');
+    user.resetPasswordExpires = Date.now() + 3600000; //expires in an hour
 };
 
 UserSchema.pre('save', async function(next) {

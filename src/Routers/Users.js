@@ -6,6 +6,7 @@ const Post = require('../Models/BlogPost')
 const githubUser = require('../Models/GithubUser')
 const axios = require('axios');
 let token = null;
+const sendResetEmail = require('../utils/resetEmail') 
 const client_id = "893912dc63ad4e40b06c"
 const client_secret = "66f5a100c8968fe473d203de95bcf96adb908f5c"//Change this oh abeg
 //Creating a new user
@@ -115,57 +116,26 @@ router.get('/users/profile', isAuthenticated, async (req,res) => {
 
 })
 
-router.post('/user/forgotpassword', (req,res) => {
-    const user = User.findOne({email: req.body.email})
+router.post('/user/forgotpassword', async (req,res) => {
+    const email = req.body.email
+    const user = await User.findOne({email: email})
     if(!user) {
         return res.status(401).json({message: 'The email address ' + req.body.email + ' is not associated with any account. Double-check your email address and try again.'})
     }
-
     user.generatePasswordReset();
-    user.save().then((user)=> {
-        console.log(user)
-        //let link = "http://" + req.headers.host + "/api/auth/reset/" + user.resetPasswordToken
-        //send mail to user.email
-    })
-    .catch(err => res.status(500).json({message: err.message}));
+    try {
+        user.save()
+        let link = "http://" + req.headers.host + "/api/auth/reset/" + user.resetPasswordToken
+        console.log(link)
+        sendResetEmail(email, link)
+        res.status(200).send("Reset email sent")
+    } catch (e) {
+        //console.log(e)
+        res.status(400).send(e)
+    }
 })
 
 
-router.post('/user/recoverpassword', (req,res) => {
-    User.findOne({email: req.body.email})
-        .then(user => {
-            if (!user) return res.status(401).json({message: 'The email address ' + req.body.email + ' is not associated with any account. Double-check your email address and try again.'});
-
-            //Generate and set password reset token
-            user.generatePasswordReset();
-
-            // Save the updated user object
-            user.save()
-                .then(user => {
-                    // send email
-                    let link = "http://" + req.headers.host + "/api/auth/reset/" + user.resetPasswordToken;
-                    const mailOptions = {
-                        to: user.email,
-                        from: process.env.FROM_EMAIL,
-                        subject: "Password change request",
-                        text: `Hi ${user.username} \n 
-                    Please click on the following link ${link} to reset your password. \n\n 
-                    If you did not request this, please ignore this email and your password will remain unchanged.\n`,
-                    };
-
-                    sgMail.send(mailOptions, (error, result) => {
-                        if (error) return res.status(500).json({message: error.message});
-
-                        res.status(200).json({message: 'A reset email has been sent to ' + user.email + '.'});
-                    });
-                })
-                .catch(err => res.status(500).json({message: err.message}));
-        })
-        .catch(err => res.status(500).json({message: err.message}));
-})
-router.post = (req, res) => {
-
-};
 
 module.exports = router
 
