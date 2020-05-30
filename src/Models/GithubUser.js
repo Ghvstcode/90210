@@ -1,6 +1,4 @@
 const mongoose = require("mongoose");
-const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
 const BlogPost = require('./BlogPost')
 
 const UserSchema = new mongoose.Schema({
@@ -49,8 +47,8 @@ UserSchema.pre('remove', async function(next) {
     next()
 })
 
-const User = mongoose.model('githubUser', UserSchema)
-module.exports = User;
+const githubUser = mongoose.model('githubUser', UserSchema)
+module.exports = githubUser;
 
 
 
@@ -58,14 +56,3 @@ module.exports = User;
 
 
 
-
-// const me = new User({
-//     name: 'Andrew',
-//     age: 75
-// })
-
-// me.save().then(()=> {
-//     console.log(me)
-// }).catch((e)=> {
-//     console.log(e)
-// })

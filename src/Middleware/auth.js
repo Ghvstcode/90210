@@ -9,7 +9,7 @@ const auth =  async (req,res,next) => {
         const decoded = jwt.verify(token, 'blueferrari')//REMEMBER TO HIDE SECRET
         const user =  await User.findOne({ _id:decoded._id, 'tokens.token': token})
         const socialUser = await githubUser.findOne({token: token})
-        if(!user || socialUser) {
+        if(!user || !socialUser) {
             throw new Error
         } 
 
