@@ -14,7 +14,7 @@ const BlogPostSchema = new mongoose.Schema( {
         type: String,
         required: true,
         enum: ['User', 'githubUser']
-      }
+    }
 },{
     timestamps:true
 })
